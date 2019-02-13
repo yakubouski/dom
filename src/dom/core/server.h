@@ -35,7 +35,7 @@ namespace Dom {
 				return ++refs;
 			}
 			inline virtual long Release() {
-				if ((--refs) == 0) { extern long DllRefDecrement(); DllRefDecrement();  delete static_cast<T*>(this); }
+				if ((--refs) == 0) { extern long DllRefDecrement(); DllRefDecrement();  delete static_cast<T*>(this); return 0; }
 #ifdef DEBUG
 				if (refs < 0) {
 					long _refs = refs;

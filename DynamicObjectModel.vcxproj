@@ -132,6 +132,7 @@
     </Link>
     <ClCompile>
       <PreprocessorDefinitions>DEBUG</PreprocessorDefinitions>
+      <CppLanguageStandard>c++17</CppLanguageStandard>
     </ClCompile>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug-Skel|x64'">

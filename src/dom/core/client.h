@@ -87,8 +87,10 @@ namespace Dom {
 		}
 
 		/* Object server interfaces implement */
-		template <typename ... IFACES>
+		template <typename T, typename ... IFACES>
 		struct Embedded : virtual public IUnknown, virtual public IFACES... {
+		private:
+			std::atomic_long refs;
 			template<typename TP>
 			struct cast_interface {
 				gid ciid;
@@ -96,13 +98,32 @@ namespace Dom {
 				inline bool cast(const clsuid& iid, TP& t, void **ppv) const { if (ciid == iid) { *ppv = static_cast<void*>(&t);  static_cast<IUnknown*>(&t)->AddRef(); return true; }  return false; }
 			};
 		public:
-			Embedded() { DOM_CALL_TRACE(""); }
+			Embedded() : refs(0) { DOM_CALL_TRACE(""); }
 			virtual ~Embedded() { DOM_CALL_TRACE(""); }
 			
 			inline operator IUnknown*() { return static_cast<IUnknown*>(this); }
 
-			inline virtual long AddRef() { DOM_CALL_TRACE(""); return 1; }
-			inline virtual long Release() { DOM_CALL_TRACE(""); return 1; }
+			inline virtual long AddRef() {
+#ifdef DEBUG
+				if (refs < 0) {
+					long _refs = refs;
+					fprintf(stderr, "`Object::uiid(%s)` was to be destroyed. Incorrect reference counter (%ld < 0). `%s:%ls`\n", T::guid().c_str(), _refs, __PRETTY_FUNCTION__, __LINE__);
+				}
+#endif // DEBUG
+				DOM_CALL_TRACE("Refs<%ld>", (long)refs + 1);
+				return ++refs;
+			}
+			inline virtual long Release() {
+				if ((--refs) == 0) { delete static_cast<T*>(this); return 0; }
+#ifdef DEBUG
+				if (refs < 0) {
+					long _refs = refs;
+					fprintf(stderr, "Incorrect release of `Object::uiid(%s)`. Reference counter less zero (%ld). `%s:%ls`\n", T::guid().c_str(), _refs, __PRETTY_FUNCTION__, __LINE__);
+				}
+#endif // DEBUG
+				DOM_CALL_TRACE("Refs<%ld>", (long)refs);
+				return refs;
+			}
 			inline virtual bool QueryInterface(const uiid& iid, void **ppv) {
 				const static cast_interface<decltype(*this)> guids[] = { IFACES::guid()...,IUnknown::guid() };
 				*ppv = nullptr;
@@ -225,10 +246,35 @@ namespace Dom {
 			std::mutex																listLock;
 			std::unordered_multimap<clsuid, std::pair<std::string, std::string>>	listClasses;
 			std::unordered_map<std::string, Dll>									listServers;
-			class CSharedServer : public Embedded<IRegistry> {
+			class CSharedServer : virtual public IUnknown, virtual public IRegistry {
 				std::string SoPathName, RegistryPath;
 			public:
-				CSharedServer(std::string& So, std::string& Path) : SoPathName(So), RegistryPath(PathName(std::move(Path))) { ; }
+				CSharedServer(std::string& So, std::string& Path) : SoPathName(So), RegistryPath(PathName(std::move(Path))) { DOM_CALL_TRACE(""); }
+
+				virtual ~CSharedServer() { DOM_CALL_TRACE(""); }
+
+				inline operator IUnknown*() { return static_cast<IUnknown*>(this); }
+
+				inline virtual long AddRef() { return 1; }
+				inline virtual long Release() { return 1; }
+
+				inline virtual bool QueryInterface(const uiid& iid, void **ppv) {
+					if (IUnknown::guid() == iid) {
+						*ppv = static_cast<IUnknown*>(this); 
+						static_cast<IUnknown*>(this)->AddRef(); 
+						return true;
+					}
+					else if (IRegistry::guid() == iid) {
+						*ppv = static_cast<IRegistry*>(this);
+						static_cast<IUnknown*>(this)->AddRef();
+						return true;
+					}
+#ifdef DEBUG
+					fprintf(stderr, "Interface `uiid(%s)` for `uiid(%s)` not implemented. `%s:%ls`\n", iid.c_str(), "CSharedServer", __PRETTY_FUNCTION__, __LINE__);
+#endif // DEBUG
+					return false;
+				}
+
 				inline bool Register(std::string& Scope) {
 					Dll so(SoPathName);
 					IUnknown* registry;
@@ -268,7 +314,7 @@ namespace Dom {
 				}
 			};
 
-			class CEmbedServer : public Embedded<IRegistry> {
+			class CEmbedServer : virtual public IUnknown, virtual public IRegistry {
 				std::string SoPathName;
 				std::unordered_multimap<clsuid, std::pair<std::string, std::string>>&	listClasses;
 				std::unordered_map<std::string, Dll>&								listServers;
@@ -282,6 +328,30 @@ namespace Dom {
 						so.InstallServer(registry);
 					}
 				}
+				virtual ~CEmbedServer() { DOM_CALL_TRACE(""); }
+
+				inline operator IUnknown*() { return static_cast<IUnknown*>(this); }
+
+				inline virtual long AddRef() { return 1; }
+				inline virtual long Release() { return 1; }
+
+				inline virtual bool QueryInterface(const uiid& iid, void **ppv) {
+					if (IUnknown::guid() == iid) {
+						*ppv = static_cast<IUnknown*>(this);
+						static_cast<IUnknown*>(this)->AddRef();
+						return true;
+					}
+					else if (IRegistry::guid() == iid) {
+						*ppv = static_cast<IRegistry*>(this);
+						static_cast<IUnknown*>(this)->AddRef();
+						return true;
+					}
+#ifdef DEBUG
+					fprintf(stderr, "Interface `uiid(%s)` for `uiid(%s)` not implemented. `%s:%ls`\n", iid.c_str(), "CEmbedServer", __PRETTY_FUNCTION__, __LINE__);
+#endif // DEBUG
+					return false;
+				}
+
 				inline virtual bool RegisterClass(const clsuid& uid, std::string&& Scope) {
 					listClasses.emplace(uid, std::make_pair(Scope, SoPathName));
 					listServers.emplace(SoPathName, Dll(SoPathName));
