@@ -1,2 +1,2 @@
-# dom
+# DOM
 Dynamic Object Model
