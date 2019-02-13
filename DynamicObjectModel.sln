@@ -1,0 +1,55 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 15
+VisualStudioVersion = 15.0.28307.271
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Dynamic-Object-Model", "DynamicObjectModel.vcxproj", "{88BCA084-6C6A-4802-9A52-61A1ADD0D6B3}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|ARM = Debug|ARM
+		Debug|ARM64 = Debug|ARM64
+		Debug|x64 = Debug|x64
+		Debug|x86 = Debug|x86
+		Debug-Skel|ARM = Debug-Skel|ARM
+		Debug-Skel|ARM64 = Debug-Skel|ARM64
+		Debug-Skel|x64 = Debug-Skel|x64
+		Debug-Skel|x86 = Debug-Skel|x86
+		Release|ARM = Release|ARM
+		Release|ARM64 = Release|ARM64
+		Release|x64 = Release|x64
+		Release|x86 = Release|x86
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{88BCA084-6C6A-4802-9A52-61A1ADD0D6B3}.Debug|ARM.ActiveCfg = Debug|ARM
+		{88BCA084-6C6A-4802-9A52-61A1ADD0D6B3}.Debug|ARM.Build.0 = Debug|ARM
+		{88BCA084-6C6A-4802-9A52-61A1ADD0D6B3}.Debug|ARM64.ActiveCfg = Debug|ARM64
+		{88BCA084-6C6A-4802-9A52-61A1ADD0D6B3}.Debug|ARM64.Build.0 = Debug|ARM64
+		{88BCA084-6C6A-4802-9A52-61A1ADD0D6B3}.Debug|x64.ActiveCfg = Debug|x64
+		{88BCA084-6C6A-4802-9A52-61A1ADD0D6B3}.Debug|x64.Build.0 = Debug|x64
+		{88BCA084-6C6A-4802-9A52-61A1ADD0D6B3}.Debug|x86.ActiveCfg = Debug|x86
+		{88BCA084-6C6A-4802-9A52-61A1ADD0D6B3}.Debug|x86.Build.0 = Debug|x86
+		{88BCA084-6C6A-4802-9A52-61A1ADD0D6B3}.Debug-Skel|ARM.ActiveCfg = Debug-Skel|ARM
+		{88BCA084-6C6A-4802-9A52-61A1ADD0D6B3}.Debug-Skel|ARM.Build.0 = Debug-Skel|ARM
+		{88BCA084-6C6A-4802-9A52-61A1ADD0D6B3}.Debug-Skel|ARM64.ActiveCfg = Debug-Skel|ARM64
+		{88BCA084-6C6A-4802-9A52-61A1ADD0D6B3}.Debug-Skel|ARM64.Build.0 = Debug-Skel|ARM64
+		{88BCA084-6C6A-4802-9A52-61A1ADD0D6B3}.Debug-Skel|x64.ActiveCfg = Debug-Skel|x64
+		{88BCA084-6C6A-4802-9A52-61A1ADD0D6B3}.Debug-Skel|x64.Build.0 = Debug-Skel|x64
+		{88BCA084-6C6A-4802-9A52-61A1ADD0D6B3}.Debug-Skel|x86.ActiveCfg = Debug-Skel|x86
+		{88BCA084-6C6A-4802-9A52-61A1ADD0D6B3}.Debug-Skel|x86.Build.0 = Debug-Skel|x86
+		{88BCA084-6C6A-4802-9A52-61A1ADD0D6B3}.Release|ARM.ActiveCfg = Release|ARM
+		{88BCA084-6C6A-4802-9A52-61A1ADD0D6B3}.Release|ARM.Build.0 = Release|ARM
+		{88BCA084-6C6A-4802-9A52-61A1ADD0D6B3}.Release|ARM64.ActiveCfg = Release|ARM64
+		{88BCA084-6C6A-4802-9A52-61A1ADD0D6B3}.Release|ARM64.Build.0 = Release|ARM64
+		{88BCA084-6C6A-4802-9A52-61A1ADD0D6B3}.Release|x64.ActiveCfg = Release|x64
+		{88BCA084-6C6A-4802-9A52-61A1ADD0D6B3}.Release|x64.Build.0 = Release|x64
+		{88BCA084-6C6A-4802-9A52-61A1ADD0D6B3}.Release|x86.ActiveCfg = Release|x86
+		{88BCA084-6C6A-4802-9A52-61A1ADD0D6B3}.Release|x86.Build.0 = Release|x86
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {30CF9931-156D-4758-B805-20AEF2C8C9FC}
+	EndGlobalSection
+EndGlobal
