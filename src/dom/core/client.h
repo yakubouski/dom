@@ -244,7 +244,7 @@ namespace Dom {
 			};
 		private:
 			std::mutex																listLock;
-			std::unordered_multimap<clsuid, std::pair<std::string, std::string>>	listClasses;
+			std::unordered_multimap<clsuid, std::pair<std::string, std::string>, Dom::GUID::Hash, Dom::GUID::Equal>	listClasses;
 			std::unordered_map<std::string, Dll>									listServers;
 			class CSharedServer : virtual public IUnknown, virtual public IRegistry {
 				std::string SoPathName, RegistryPath;
@@ -294,7 +294,7 @@ namespace Dom {
 				}
 				inline virtual bool RegisterClass(const clsuid& uid, std::string&& Scope) {
 					auto ScopePath = PathName(std::move(RegistryPath), std::move(Scope));
-					if (MakeDir(ScopePath) == 0 && symlink(SoPathName.c_str(), std::string(ScopePath + uid).c_str()) == 0) {
+					if (MakeDir(ScopePath) == 0 && symlink(SoPathName.c_str(), std::string(ScopePath + uid.c_str()).c_str()) == 0) {
 						return true;
 					}
 #ifdef DEBUG
@@ -306,20 +306,20 @@ namespace Dom {
 				}
 				inline virtual bool UnRegisterClass(const clsuid& uid, std::string&& Scope) {
 					auto ScopePath = PathName(std::move(RegistryPath), std::move(Scope));
-					return remove(std::string(ScopePath + uid).c_str()) == 0;
+					return remove(std::string(ScopePath + uid.c_str()).c_str()) == 0;
 				}
 				inline virtual bool ClassExist(const clsuid& uid, std::string&& Scope) {
 					auto ScopePath = PathName(std::move(RegistryPath), std::move(Scope));
-					return Exist(std::string(ScopePath + uid)) == 0;
+					return Exist(std::string(ScopePath + uid.c_str())) == 0;
 				}
 			};
 
 			class CEmbedServer : virtual public IUnknown, virtual public IRegistry {
 				std::string SoPathName;
-				std::unordered_multimap<clsuid, std::pair<std::string, std::string>>&	listClasses;
+				std::unordered_multimap<clsuid, std::pair<std::string, std::string>,GUID::Hash, GUID::Equal>&	listClasses;
 				std::unordered_map<std::string, Dll>&								listServers;
 			public:
-				CEmbedServer(std::string& So, std::string& Scope, std::unordered_multimap<clsuid, std::pair<std::string, std::string>>& classes, std::unordered_map<std::string, Dll>& servers)
+				CEmbedServer(std::string& So, std::string& Scope, std::unordered_multimap<clsuid, std::pair<std::string, std::string>,GUID::Hash, GUID::Equal>& classes, std::unordered_map<std::string, Dll>& servers)
 					: SoPathName(So), listClasses(classes), listServers(servers) {
 					Dll so(So);
 					IUnknown* registry;
@@ -416,7 +416,7 @@ namespace Dom {
 				*ppv = nullptr;
 				std::unique_lock<std::mutex> lock(listLock);
 				try {
-					auto clsId = Dom::ClsId(std::move(cid));
+					auto clsId = Dom::ClsId(cid.c_str());
 					auto&& clsEntries = listClasses.equal_range(clsId);
 					for (auto&& clsEntry = clsEntries.first; clsEntry != clsEntries.second;clsEntry++) {
 						if (clsEntry->second.first == Scope) {

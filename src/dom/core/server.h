@@ -72,7 +72,7 @@ namespace Dom {
 				return false;
 			}
 			std::atomic_long															RegistryRefsCounter;
-			std::unordered_map<clsuid, std::function<bool(const clsuid& iid, void **ppv)>>	RegistryExports;
+			std::unordered_map<clsuid, std::function<bool(const clsuid& iid, void **ppv)>, Dom::GUID::Hash, Dom::GUID::Equal>	RegistryExports;
 		public:
 			ClassRegistry() : RegistryRefsCounter(0), RegistryExports({ std::make_pair(CLASSLIST::guid(),&CreateObject<CLASSLIST>)... }) { DOM_CALL_TRACE(""); }
 			virtual ~ClassRegistry() { DOM_CALL_TRACE(""); }

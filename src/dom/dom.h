@@ -16,12 +16,6 @@
 #endif
 
 #include "./core/interface.h"
-
-namespace Dom {
-	static inline const clsuid ClsId(const clsuid&& class_name) { return clsuid(dom_cls_pre_name + class_name); }
-	static inline const uiid IId(const uiid&& interface_name) { return uiid(dom_guid_pre_name + interface_name); }
-}
-
 #include "./core/server.h"
 #include "./core/client.h"
 

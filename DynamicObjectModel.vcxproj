@@ -122,6 +122,7 @@
     <ClInclude Include="src\dom\core\interface.h" />
     <ClInclude Include="src\dom\core\client.h" />
     <ClInclude Include="src\dom\core\server.h" />
+    <ClInclude Include="src\dom\guid.h" />
     <ClInclude Include="src\dom\IManager.h" />
     <ClInclude Include="src\dom\IRegistry.h" />
     <ClInclude Include="src\dom\IUnknown.h" />
@@ -142,6 +143,11 @@
     <ClCompile>
       <PreprocessorDefinitions>DEBUG;DOM_SAMPLE</PreprocessorDefinitions>
     </ClCompile>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <Link>
+      <LibraryDependencies>dl</LibraryDependencies>
+    </Link>
   </ItemDefinitionGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets" />

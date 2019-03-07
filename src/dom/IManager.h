@@ -5,7 +5,7 @@
 
 namespace Dom {
 
-	using ClassList = std::forward_list<std::pair<std::string, std::string>>;
+	using ClassList = std::forward_list<std::pair<clsuid, std::string>>;
 
 	struct IManager : public virtual IUnknown {
 		virtual bool CreateInstance(const clsuid& /* Class Unique ID */, void **, std::string /* Additional namespace */) = 0;
