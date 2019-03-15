@@ -95,7 +95,7 @@ namespace Dom {
 			struct cast_interface {
 				gid ciid;
 				cast_interface(const clsuid& iid) : ciid(iid) { ; }
-				inline bool cast(const clsuid& iid, TP& t, void **ppv) const { if (ciid == iid) { *ppv = static_cast<void*>(&t);  static_cast<IUnknown*>(&t)->AddRef(); return true; }  return false; }
+				inline bool cast(const clsuid& iid, TP& t, void **ppv) const { if (ciid == iid) { *ppv = static_cast<void*>(&t);  return true; }  return false; }
 			};
 		public:
 			Embedded() : refs(0) { DOM_CALL_TRACE(""); }
@@ -240,7 +240,7 @@ namespace Dom {
 			struct cast_interface {
 				gid ciid;
 				cast_interface(const clsuid& iid) : ciid(iid) { ; }
-				inline bool cast(const clsuid& iid, TP& t, void **ppv) const { if (ciid == iid) { *ppv = static_cast<void*>(&t);  static_cast<IUnknown*>(&t)->AddRef(); return true; }  return false; }
+				inline bool cast(const clsuid& iid, TP& t, void **ppv) const { if (ciid == iid) { *ppv = static_cast<void*>(&t);  return true; }  return false; }
 			};
 		private:
 			std::mutex																listLock;
