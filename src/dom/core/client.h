@@ -16,6 +16,15 @@
 
 namespace Dom {
 	namespace Client {
+
+		struct cast_interface {
+			const uiid	ciid;
+			void*		cpv;
+			template<typename TP>
+			cast_interface(const uiid iid, TP* pv) : ciid(iid), cpv(pv){ ; }
+			inline bool cast(const uiid& iid,void **ppv) const { if (ciid == iid) { *ppv = cpv; return true; }return false; }
+		};
+
 		extern "C"
 		{
 			typedef bool(*__DllCreateInstance)(const clsuid&, void**);
@@ -91,12 +100,6 @@ namespace Dom {
 		struct Embedded : virtual public IUnknown, virtual public IFACES... {
 		private:
 			std::atomic_long refs;
-			template<typename TP>
-			struct cast_interface {
-				gid ciid;
-				cast_interface(const clsuid& iid) : ciid(iid) { ; }
-				inline bool cast(const clsuid& iid, TP& t, void **ppv) const { if (ciid == iid) { *ppv = static_cast<void*>(&t);  return true; }  return false; }
-			};
 		public:
 			Embedded() : refs(0) { DOM_CALL_TRACE(""); }
 			virtual ~Embedded() { DOM_CALL_TRACE(""); }
@@ -125,10 +128,10 @@ namespace Dom {
 				return refs;
 			}
 			inline virtual bool QueryInterface(const uiid& iid, void **ppv) {
-				const static cast_interface<decltype(*this)> guids[] = { IFACES::guid()...,IUnknown::guid() };
+				const cast_interface guids[] = { cast_interface(IFACES::guid(),(IFACES*)this)...,cast_interface(IUnknown::guid(),(IUnknown*)this) };
 				*ppv = nullptr;
 				for (auto&& it : guids) {
-					if (it.cast(iid, *this, ppv)) { DOM_CALL_TRACE("`%s`", iid.c_str()); return true; }
+					if (it.cast(iid, ppv)) { DOM_CALL_TRACE("`%s`", iid.c_str()); return true; }
 				}
 				DOM_ERR("Interface `uiid(%s)` for `uiid(%s)` not implemented", iid.c_str(), std::remove_reference<decltype(*this)>::type::guid().c_str());
 				return false;
@@ -235,13 +238,7 @@ namespace Dom {
 		};
 
 		template<typename ... IFACES>
-		class Manager : virtual public IUnknown, virtual public IFACES... {
-			template<typename TP>
-			struct cast_interface {
-				gid ciid;
-				cast_interface(const clsuid& iid) : ciid(iid) { ; }
-				inline bool cast(const clsuid& iid, TP& t, void **ppv) const { if (ciid == iid) { *ppv = static_cast<void*>(&t);  return true; }  return false; }
-			};
+		class Manager : virtual public IUnknown, public IFACES... {
 		private:
 			std::mutex																listLock;
 			std::unordered_multimap<clsuid, std::pair<std::string, std::string>, Dom::GUID::Hash, Dom::GUID::Equal>	listClasses;
@@ -314,7 +311,7 @@ namespace Dom {
 				}
 			};
 
-			class CEmbedServer : virtual public IUnknown, virtual public IRegistry {
+			class CEmbedServer : virtual public IUnknown, public IRegistry {
 				std::string SoPathName;
 				std::unordered_multimap<clsuid, std::pair<std::string, std::string>,GUID::Hash, GUID::Equal>&	listClasses;
 				std::unordered_map<std::string, Dll>&								listServers;
@@ -387,10 +384,10 @@ namespace Dom {
 			inline virtual long AddRef() { DOM_CALL_TRACE(""); return 1; }
 			inline virtual long Release() { DOM_CALL_TRACE(""); return 1; }
 			inline virtual bool QueryInterface(const uiid& iid, void **ppv) {
-				const static cast_interface<decltype(*this)> guids[] = { IFACES::guid()...,IUnknown::guid() };
+				const cast_interface guids[] = { cast_interface(IFACES::guid(),(IFACES*)this)...,cast_interface(IUnknown::guid(),(IUnknown*)this) };
 				*ppv = nullptr;
 				for (auto&& it : guids) {
-					if (it.cast(iid, *this, ppv)) { DOM_CALL_TRACE("`%s`", iid.c_str()); return true; }
+					if (it.cast(iid, ppv)) { DOM_CALL_TRACE("`%s`", iid.c_str()); return true; }
 				}
 				DOM_ERR("Interface `uiid(%s)` for `uiid(%s)` not implemented", iid.c_str(), std::remove_reference<decltype(*this)>::type::guid().c_str());
 				return false;

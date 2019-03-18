@@ -7,16 +7,17 @@
 namespace Dom {
 	namespace Server {
 
+		struct cast_interface {
+			const uiid	ciid;
+			void*		cpv;
+			template<typename TP>
+			cast_interface(const uiid iid, TP* pv) : ciid(iid), cpv(pv) { ; }
+			inline bool cast(const uiid& iid, void **ppv) const { if (ciid == iid) { *ppv = cpv; return true; }return false; }
+		};
+
 		/* Object server interfaces implement */
 		template <typename T, typename ... IFACES>
-		struct Object : virtual public IUnknown, virtual public IFACES... {
-		private:
-			template<typename TP>
-			struct cast_interface {
-				gid ciid;
-				cast_interface(const clsuid& iid) : ciid(iid) { ; }
-				inline bool cast(const clsuid& iid, TP* t, void **ppv) const { if (ciid == iid) { *ppv = static_cast<void*>(t); static_cast<IUnknown*>(t)->AddRef(); return true; } return false; }
-			};
+		struct Object : virtual public IUnknown, public IFACES... {
 		private:
 			std::atomic_long refs;
 		public:
@@ -46,10 +47,10 @@ namespace Dom {
 				return refs;
 			}
 			inline virtual bool QueryInterface(const uiid& iid, void **ppv) {
-				static const cast_interface<T> guids[] = { IFACES::guid()...,IUnknown::guid() };
+				const cast_interface guids[] = { cast_interface(IFACES::guid(),(IFACES*)this)...,cast_interface(IUnknown::guid(),(IUnknown*)this) };
 				*ppv = nullptr;
 				for (auto&& it : guids) {
-					if (it.cast(iid, (T*)this, ppv)) { DOM_CALL_TRACE("`%s`", iid.c_str()); return true; }
+					if (it.cast(iid, ppv)) { DOM_CALL_TRACE("`%s`", iid.c_str()); return true; }
 				}
 #ifdef DEBUG
 				fprintf(stderr, "Interface `uiid(%s)` for `uiid(%s)` not implemented. `%s:%ls`\n", iid.c_str(), T::guid().c_str(), __PRETTY_FUNCTION__, __LINE__);

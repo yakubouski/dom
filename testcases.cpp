@@ -13,7 +13,7 @@ struct IRegistry2 : public virtual IUnknown {
 	IID(Registry2)
 };
 
-class CManager : virtual public Dom::Client::Manager<IRegistry2> {
+class CManager : public Dom::Client::Manager<IRegistry2> {
 public:
 	virtual bool RegisterClass2(const clsuid& /* class uid */, std::string&& /* Namespace */) {
 		return true;
